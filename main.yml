@@ -1,0 +1,23 @@
+---
+- name: "Deploying test application on Staging and Production Environment"
+  hosts: localhost
+  vars_prompt:
+    - name: "env"
+      prompt: "Enter the environment -(stg) for staging and (prod) for production"
+      private: no
+
+    - name: "key_name"
+      prompt: "Enter the SSH key name"
+      private: no
+      default: "ansible"
+  roles:
+    - prod-stg
+
+############################### Deploying Code - webserver ########################################################################
+
+- name: "Deploying Code From Github"
+  hosts: webserver
+  become: true
+  serial: 1
+  roles:
+    - deployment
