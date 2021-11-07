@@ -1,0 +1,5 @@
+---
+# vars file for deployment
+
+clone_dir: "/tmp/website/"
+git_url: "https://github.com/NoelVincent/Ansible-Production-Staging.git"

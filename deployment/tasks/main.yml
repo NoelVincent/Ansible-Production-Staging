@@ -1,0 +1,69 @@
+---
+# tasks file for deployment
+
+############### Installing Packages ##################################################
+
+- name: "Installing httpd,php,git"
+  yum:
+    name:
+      - httpd
+      - git
+      - php
+    state: present
+
+####################### Cloning webserver Repository from Github ###########################
+
+- name: "clone repository from Github"
+  git:
+    repo: "{{git_url}}"
+    dest: "{{clone_dir}}"
+  register: git_info
+
+
+###################### OFF-LOAD INSTANCE FROM LB AND WAIT FOR CONNECTION DRAINING #####################
+
+- name: "Offloading instances from Load Balancer"
+  when: git_info.changed == true
+  service:
+    name: httpd
+    state: stopped
+    
+- name: "Connection Draining"
+  when: git_info.changed == true
+  pause:
+    seconds: 5
+
+###################### Copying content and Load Instance to LB #############################
+   
+- name: "Copying contents to document root"
+  when: git_info.changed == true
+  copy:
+    src: "{{clone_dir}}"
+    dest: "/var/www/html/"
+    owner: "apache"
+    group: "apache"
+    remote_src: true 
+
+- name: "Load instance back to loadbalancer"
+  when: git_info.changed == true
+  service:
+    name: httpd
+    state: restarted
+    enabled: true
+
+- name: "Health check"
+  when: git_info.changed == true
+  pause:
+    seconds: 30
+
+#################################### Printing Deployment status #########################################
+
+- name: "Deployment Status - False"
+  when: git_info.changed == false
+  debug:
+    msg: " Already have the latest version."
+
+- name: "Deployment Status True"
+  when: git_info.changed == true
+  debug:
+    msg: "Deployment Successfull"
