@@ -1,0 +1,57 @@
+---
+# tasks file for prod-stg
+
+
+############################### Fetching details of Production and Staging Environment #####################################
+
+- name: "Production Details"
+  ec2_instance_info:
+    region: "{{ region }}"
+    aws_access_key:  "{{ access_key }}"
+    aws_secret_key: "{{ secret_key }}"
+    filters:
+      instance-state-name: [ "running" ]
+      "tag:aws:autoscaling:groupName": "production"
+  register: production_info
+
+
+- name: "Staging Details"
+  ec2_instance_info:
+    region: "{{ region }}"
+    aws_access_key:  "{{ access_key }}"
+    aws_secret_key: "{{ secret_key }}"
+    filters:
+      instance-state-name: [ "running" ]
+      "tag:aws:autoscaling:groupName": "staging"
+  register: staging_info
+
+
+############################## Creating Dynamic Inventory for Production and Staging Environment ##############################
+
+- name: "Dynamic Inventory for Production"
+  when: env == "prod"
+  add_host:
+    groups: "webserver"
+    hostname: "{{ item.public_ip_address }}"
+    ansible_host: "{{ item.public_ip_address }}"
+    ansible_user: "ec2-user"
+    ansible_port: 22
+    ansible_private_key_file: "{{key_name}}.pem"
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+  with_items:
+    - "{{production_info.instances}}"
+
+
+- name: "Dynamic Inventory for Staging"
+  when: env == "stg"
+  add_host:
+    groups: "webserver"
+    hostname: "{{ item.public_ip_address }}"
+    ansible_host: "{{ item.public_ip_address }}"
+    ansible_user: "ec2-user"
+    ansible_port: 22
+    ansible_private_key_file: "{{key_name}}.pem"
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+  with_items:
+    - "{{staging_info.instances}}"
+

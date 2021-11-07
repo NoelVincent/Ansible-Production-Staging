@@ -1,0 +1,6 @@
+---
+# vars file for prod-stg
+
+region: "ap-south-1"
+access_key: " "   ===========> IAM user access_key
+access_key: " "   ===========> IAM user access_key
