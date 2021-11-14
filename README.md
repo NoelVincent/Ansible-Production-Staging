@@ -85,7 +85,7 @@ vim prod-stg/tasks/main.yml
 ```
 ```sh
 ---
-############################### Fetching details of Production and Staging Environment ##########
+############## Fetching details of Production and Staging Environment #############
 
 - name: "Production Details"
   ec2_instance_info:
@@ -107,7 +107,7 @@ vim prod-stg/tasks/main.yml
       "tag:aws:autoscaling:groupName": "staging"
   register: staging_info
 
-############################## Creating Dynamic Inventory for Production and Staging Environment ##############################
+######################### Creating Dynamic Inventory for Production and Staging Environment ########################
 
 - name: "Dynamic Inventory for Production"
   when: env == "prod"
@@ -141,7 +141,7 @@ vim deployment/tasks/main.yml
 ```
 ```sh
 ---
-############### Installing Packages ##################################################
+##################### Installing Packages #############################
 - name: "Installing httpd,php,git"
   yum:
     name:
