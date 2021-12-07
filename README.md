@@ -38,7 +38,7 @@ access_key: " "   ===========> IAM user access_key
 
 Defining variables in Role: "deployment", that will be used to Fetch and clone from Github.
 ```sh
-vim prod-stg/vars/main.yml
+vim deployment/vars/main.yml
 ```
 ```sh
 ---
